@@ -3,6 +3,8 @@ const webpack = require('webpack')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const postcssPresetEnv = require('postcss-preset-env')
 const cssnano = require('cssnano')
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const common = require('./webpack.common.js')
 const config = require('./src/config')
@@ -69,6 +71,22 @@ module.exports = merge(common, {
     new webpack.DefinePlugin({
       'process.env.ENVIRONMENT': JSON.stringify('development'),
     }),
+    // new HtmlWebpackPlugin({
+    //   template: './src/index.html',
+    // }),
   ],
   devtool: 'source-map',
+  devServer: {
+    static: {
+      directory: path.join(__dirname, 'src'),
+    },
+    compress: true,
+    port: 8080,
+    open: true,
+    onBeforeSetupMiddleware: (devServer) => {
+      devServer.app.get('/data/radar.csv', (req, res) => {
+        res.sendFile(path.join(__dirname, 'src/data/radar.csv'));
+      });
+    },
+  },
 })
